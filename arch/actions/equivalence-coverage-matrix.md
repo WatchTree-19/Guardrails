@@ -11,10 +11,10 @@ actual per-chunk or parallel bypass runtime path is not yet equivalence-pinned.
 
 | Rail | Runtime Flow | Output Mapping | Streaming Bypass | Transform Observed | Known Divergence -> Resolution |
 | --- | --- | --- | --- | --- | --- |
-| `self_check_input` | covered | N/A | N/A | none | none |
-| `self_check_output` | covered | covered | gap: unit only | none | none |
-| `self_check_facts` | covered | covered | gap: unit only | none | none |
-| `alignscore_check_facts` | covered | covered | gap: unit only | none | none |
+| `self_check_input` | covered | N/A | N/A | none | migrated to `RailOutcome`; block path preserves mask event |
+| `self_check_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome` |
+| `self_check_facts` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; threshold preserved in accuracy metadata |
+| `alignscore_check_facts` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; fallback and threshold preserved |
 | `hf_classifier_input` | covered | N/A | N/A | none | migrated to `RailOutcome` |
 | `hf_classifier_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; retrieval remains transform |
 | `hf_classifier_retrieval` | covered | N/A | N/A | output_data | retrieval clear is a transform, not an output bypass block |

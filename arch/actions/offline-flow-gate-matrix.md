@@ -43,10 +43,10 @@ Use these families to generate per-rail synthetic raw returns.
 | `content_safety` | `not response.is_blocked` gates input and output. Multilingual only changes rendered refusal. | Output maps `RailOutcome.is_blocked`. | Clean `RailOutcome`. | `rail_outcome` with empty and non-empty `policy_violations`; multilingual on/off render cases. |
 | `topic_safety` | `not response.is_blocked` gates input. | None. | Clean `RailOutcome`. | `rail_outcome`. |
 | `jailbreak_detection` | `response.is_blocked` gates heuristics and model input rails. | None. | Clean `RailOutcome`. | `rail_outcome`; cached raw `{jailbreak: true/false}` parser cases. |
-| `self_check/input_check` | `not allowed` gates input. | None. | Clean boolean allowed. | `bool_allowed`. |
-| `self_check/output_check` | `not allowed` gates output. | `lambda value: not value`. | Clean boolean allowed. | `bool_allowed`, plus tuple-wrapped results. |
-| `self_check/facts` | `accuracy < 0.5` gates output when `$check_facts` is true. | `result < 0.5`. | Clean score threshold. | `score_min_0_5`; `$check_facts` false render no-op. |
-| `factchecking/align_score` | `accuracy < 0.5` gates output when `$check_facts` is true. | `result < 0.5`. | Clean score threshold. | `score_min_0_5`; `$check_facts` false render no-op. |
+| `self_check/input_check` | `response.is_blocked` gates input. | None. | Clean `RailOutcome`. | `RailOutcome.allow()`, `RailOutcome.block()`. |
+| `self_check/output_check` | `response.is_blocked` gates output. | None after migration; bypass reads `RailOutcome` directly. | Clean `RailOutcome`. | `RailOutcome.allow()`, `RailOutcome.block()`, plus tuple-wrapped outcome results. |
+| `self_check/facts` | `response.is_blocked` gates output when `$check_facts` is true. | None after migration; bypass reads `RailOutcome` directly. | Clean `RailOutcome` with accuracy metadata. | `RailOutcome.block(accuracy=0.49)`, `RailOutcome.allow(accuracy=0.5/0.51)`; `$check_facts` false render no-op. |
+| `factchecking/align_score` | `response.is_blocked` gates output when `$check_facts` is true. | None after migration; bypass reads `RailOutcome` directly. | Clean `RailOutcome` with accuracy metadata. | `RailOutcome.block(accuracy=0.49)`, `RailOutcome.allow(accuracy=0.5/0.51)`; `$check_facts` false render no-op. |
 | `hallucination` | `self check hallucination` blocks on `is_hallucination`; `hallucination warning` only renders a warning on the same boolean. | `lambda value: value`. | Flow-specific consequence. | `bool_flag`; include one block flow case and one warning-only flow case. |
 | `hf_classifier` | `not response.is_blocked` gates input/output; retrieval still clears chunks on not allowed. | None for output after migration; bypass reads `RailOutcome` directly. | Clean `RailOutcome` for input/output plus retrieval transform. | `RailOutcome.allow()`, `RailOutcome.block()`; retrieval `False -> relevant_chunks=""` remains deferred until transform contract. |
 | `llama_guard` | `not response.is_blocked` gates input/output; policy violations are read from `response.metadata`. | None after migration; bypass reads `RailOutcome` directly. | Clean `RailOutcome` with fail-closed parser fallback. | `RailOutcome.allow(policy_violations=None)`, `RailOutcome.block(policy_violations=[...])`, unparseable `RailOutcome.block(policy_violations=[])`. |
@@ -95,9 +95,8 @@ Use these families to generate per-rail synthetic raw returns.
 Start with rails where the decision is clean and the fixture count is small:
 
 1. `content_safety`, `topic_safety`, `jailbreak_detection`
-2. `self_check/output_check`, `self_check/facts`, `factchecking/align_score`
-3. `privateai`, `gliner`, `sensitive_data_detection`, `regex`
-4. `llama_guard`, `hf_classifier`, `policyai`, `trend_micro`
+2. `privateai`, `gliner`, `sensitive_data_detection`, `regex`
+3. `trend_micro`, `cleanlab`, `ai_defense`
 
 After those pass, add the transform rails:
 
