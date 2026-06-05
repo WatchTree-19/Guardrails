@@ -22,21 +22,21 @@ actual per-chunk or parallel bypass runtime path is not yet equivalence-pinned.
 | `llama_guard_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; bypass reads outcome directly |
 | `policyai_input` | covered | N/A | N/A | none | migrated to `RailOutcome` |
 | `policyai_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; metadata preserves exception message |
-| `regex_input` | covered | N/A | N/A | none | none |
-| `regex_output` | covered | covered | gap: unit only | none | none |
+| `regex_input` | covered | N/A | N/A | none | deferred with `regex_retrieval`; same action has block and transform consequences |
+| `regex_output` | covered | covered | gap: unit only | none | deferred with `regex_retrieval`; same action has block and transform consequences |
 | `regex_retrieval` | covered | N/A | N/A | output_data | retrieval clear is a transform, not an output bypass block |
-| `privateai_detect_input` | covered | N/A | N/A | none | none |
-| `privateai_detect_output` | covered | covered | gap: unit only | none | none |
+| `privateai_detect_input` | covered | N/A | N/A | none | migrated to `RailOutcome` |
+| `privateai_detect_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome` |
 | `privateai_mask_input` | covered | N/A | N/A | output_data | transform only; no output mapping path |
 | `privateai_mask_output` | covered | default covered | gap: unit only | text | default string mapping cannot express transform -> replace with `RailOutcome` |
 | `privateai_mask_retrieval` | covered | N/A | N/A | output_data | transform only; no output mapping path |
-| `gliner_detect_input` | covered | N/A | N/A | none | none |
-| `gliner_detect_output` | covered | covered | gap: unit only | none | none |
+| `gliner_detect_input` | covered | N/A | N/A | none | migrated to `RailOutcome` |
+| `gliner_detect_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome` |
 | `gliner_mask_input` | covered | N/A | N/A | output_data | transform only; no output mapping path |
 | `gliner_mask_output` | covered | default covered | gap: unit only | text | default string mapping cannot express transform -> replace with `RailOutcome` |
 | `gliner_mask_retrieval` | covered | N/A | N/A | output_data | transform only; no output mapping path |
-| `sensitive_data_detect_input` | covered | N/A | N/A | none | none |
-| `sensitive_data_detect_output` | covered | covered | gap: unit only | none | none |
+| `sensitive_data_detect_input` | covered | N/A | N/A | none | migrated to `RailOutcome` |
+| `sensitive_data_detect_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome` |
 | `sensitive_data_mask_input` | covered | N/A | N/A | output_data | transform only; no output mapping path |
 | `sensitive_data_mask_output` | covered | default covered | gap: unit only | text | default string mapping cannot express transform -> replace with `RailOutcome` |
 | `sensitive_data_mask_retrieval` | covered | N/A | N/A | output_data | transform only; no output mapping path |

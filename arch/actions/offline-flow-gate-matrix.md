@@ -50,10 +50,10 @@ Use these families to generate per-rail synthetic raw returns.
 | `hallucination` | `self check hallucination` blocks on `is_hallucination`; `hallucination warning` only renders a warning on the same boolean. | `lambda value: value`. | Flow-specific consequence. | `bool_flag`; include one block flow case and one warning-only flow case. |
 | `hf_classifier` | `not response.is_blocked` gates input/output; retrieval still clears chunks on not allowed. | None for output after migration; bypass reads `RailOutcome` directly. | Clean `RailOutcome` for input/output plus retrieval transform. | `RailOutcome.allow()`, `RailOutcome.block()`; retrieval `False -> relevant_chunks=""` remains deferred until transform contract. |
 | `llama_guard` | `not response.is_blocked` gates input/output; policy violations are read from `response.metadata`. | None after migration; bypass reads `RailOutcome` directly. | Clean `RailOutcome` with fail-closed parser fallback. | `RailOutcome.allow(policy_violations=None)`, `RailOutcome.block(policy_violations=[...])`, unparseable `RailOutcome.block(policy_violations=[])`. |
-| `privateai` | `has_pii` gates input/output/retrieval; mask flows rewrite text. | Detect maps identity. | Boolean flag plus transform. | `bool_flag`; mask input/output/retrieval with changed and unchanged text. |
-| `gliner` | `has_pii` gates input/output/retrieval; mask flows rewrite text. | Detect maps identity. | Boolean flag plus transform. | `bool_flag`; mask input/output/retrieval with changed and unchanged text. |
-| `sensitive_data_detection` | `has_sensitive_data` gates input/output/retrieval; mask flows rewrite text. | Detect maps identity. | Boolean flag plus transform. | `bool_flag`; mask input/output/retrieval with changed and unchanged text. |
-| `regex` | `result["is_match"]` gates input/output; retrieval match clears chunks. | `result.get("is_match", False)`. | Dict flag plus retrieval transform. | `dict_flag("is_match")`; retrieval match -> `relevant_chunks=""`; missing key adjudication. |
+| `privateai` | `response.is_blocked` gates input/output/retrieval detect rails; mask flows rewrite text. | None for detect output after migration; bypass reads `RailOutcome` directly. | Clean `RailOutcome` for detect plus transform masks. | Detect `RailOutcome.allow()`, `RailOutcome.block()`; mask input/output/retrieval with changed and unchanged text remains deferred until transform contract. |
+| `gliner` | `response.is_blocked` gates input/output/retrieval detect rails; mask flows rewrite text. | None for detect output after migration; bypass reads `RailOutcome` directly. | Clean `RailOutcome` for detect plus transform masks. | Detect `RailOutcome.allow()`, `RailOutcome.block()`; mask input/output/retrieval with changed and unchanged text remains deferred until transform contract. |
+| `sensitive_data_detection` | `response.is_blocked` gates input/output/retrieval detect rails; mask flows rewrite text. | None for detect output after migration; bypass reads `RailOutcome` directly. | Clean `RailOutcome` for detect plus transform masks. | Detect `RailOutcome.allow()`, `RailOutcome.block()`; mask input/output/retrieval with changed and unchanged text remains deferred until transform contract. |
+| `regex` | `result["is_match"]` gates input/output; retrieval match clears chunks. | `result.get("is_match", False)`. | Dict flag plus retrieval transform. | Deferred until transform contract because one action has block consequences for input/output and a transform consequence for retrieval. |
 | `policyai` | `result.is_blocked` gates input/output; render metadata preserves category and exception message. | None after migration; bypass reads `RailOutcome` directly. | Clean `RailOutcome` with metadata. | `RailOutcome.allow(**safe_metadata)`, `RailOutcome.block(**unsafe_metadata)`. |
 | `trend_micro` | `result.blocked` gates input/output and API errors fail open except missing API key returns block. | `result.action.lower() == "block"`. | Clean object flag with API fallback. | `GuardResult(action="Allow")`, `GuardResult(action="Block")`, API error allow fallback, missing key block fallback. |
 | `cleanlab` | `trustworthiness_score < 0.6` gates output. | Same threshold with missing default `1`. | Clean score threshold. | `score_min_0_6`; missing score adjudication. |
@@ -95,8 +95,7 @@ Use these families to generate per-rail synthetic raw returns.
 Start with rails where the decision is clean and the fixture count is small:
 
 1. `content_safety`, `topic_safety`, `jailbreak_detection`
-2. `privateai`, `gliner`, `sensitive_data_detection`, `regex`
-3. `trend_micro`, `cleanlab`, `ai_defense`
+2. `trend_micro`, `cleanlab`, `ai_defense`
 
 After those pass, add the transform rails:
 
