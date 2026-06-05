@@ -79,12 +79,14 @@ Already covered:
 - `alignscore check facts`
 - `hf classifier check input`
 - `hf classifier check output`
+- `hf classifier check retrieval`
 - `llama guard check input`
 - `llama guard check output`
 - `policyai moderation on input`
 - `policyai moderation on output`
 - `regex check input`
 - `regex check output`
+- `regex check retrieval`
 - `detect pii on input`
 - `detect pii on output`
 - `gliner detect pii on input`
@@ -117,8 +119,7 @@ Already covered:
 
 Next tasks:
 
-1. Add remaining retrieval transform rows for `regex` and `hf_classifier`.
-2. Add score and adjudication rows for the remaining vendor rails.
+1. Add score and adjudication rows for the remaining vendor rails.
 
 Gate:
 
@@ -338,7 +339,6 @@ Gate:
 
 Continue Phase 1 and Phase 2 together for the next small slice:
 
-1. Add retrieval transform rows for `regex` and `hf_classifier`.
-2. Add the next score/adjudication rail family after that.
+1. Add the next score/adjudication rail family.
 3. Run the focused test files.
 4. Commit that slice before moving to the next rail family.
