@@ -100,6 +100,12 @@ Already covered:
 - `mask sensitive data on input`
 - `mask sensitive data on output`
 - `mask sensitive data on retrieval`
+- `pangea ai guard input`
+- `pangea ai guard output`
+- `crowdstrike aidr guard input`
+- `crowdstrike aidr guard output`
+- `protect prompt`
+- `protect response`
 - `content safety check output`
 - `topic safety check input`
 - `jailbreak detection heuristics`
@@ -107,9 +113,7 @@ Already covered:
 
 Next tasks:
 
-1. Add block-or-transform vendor rails: `pangea`, `crowdstrike_aidr`, and
-   `prompt_security`.
-2. Add remaining transform rails after that.
+1. Add remaining transform rails after that.
 
 Gate:
 
@@ -135,8 +139,8 @@ Deliverables:
 
 Next tasks:
 
-1. Add explicit divergence rows for guardrails_ai, clavata, pangea,
-   crowdstrike_aidr, and injection_detection.
+1. Add explicit divergence rows for guardrails_ai, clavata, and
+   injection_detection.
 
 Gate:
 
@@ -145,7 +149,7 @@ Gate:
 
 ## Phase 3: Parser And Action Unit Coverage
 
-Status: not started.
+Status: in progress.
 
 Goal:
 
@@ -329,8 +333,8 @@ Gate:
 
 Continue Phase 1 and Phase 2 together for the next small slice:
 
-1. Add block-or-transform runtime rows for `pangea`, `crowdstrike_aidr`, and
-   `prompt_security`.
-2. Add output bypass divergence rows for those rails.
+1. Add remaining runtime transform rows for `autoalign` and
+   `injection_detection`.
+2. Add output bypass divergence rows for the remaining known divergent mappings.
 3. Run the focused test files.
 4. Commit that slice before moving to the next rail family.
