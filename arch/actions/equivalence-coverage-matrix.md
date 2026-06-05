@@ -15,13 +15,13 @@ actual per-chunk or parallel bypass runtime path is not yet equivalence-pinned.
 | `self_check_output` | covered | covered | gap: unit only | none | none |
 | `self_check_facts` | covered | covered | gap: unit only | none | none |
 | `alignscore_check_facts` | covered | covered | gap: unit only | none | none |
-| `hf_classifier_input` | covered | N/A | N/A | none | none |
-| `hf_classifier_output` | covered | covered | gap: unit only | none | none |
+| `hf_classifier_input` | covered | N/A | N/A | none | migrated to `RailOutcome` |
+| `hf_classifier_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; retrieval remains transform |
 | `hf_classifier_retrieval` | covered | N/A | N/A | output_data | retrieval clear is a transform, not an output bypass block |
 | `llama_guard_input` | covered | N/A | N/A | none | migrated to `RailOutcome`; fail-closed unparseable case pinned |
 | `llama_guard_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; bypass reads outcome directly |
-| `policyai_input` | covered | N/A | N/A | none | none |
-| `policyai_output` | covered | covered | gap: unit only | none | none |
+| `policyai_input` | covered | N/A | N/A | none | migrated to `RailOutcome` |
+| `policyai_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; metadata preserves exception message |
 | `regex_input` | covered | N/A | N/A | none | none |
 | `regex_output` | covered | covered | gap: unit only | none | none |
 | `regex_retrieval` | covered | N/A | N/A | output_data | retrieval clear is a transform, not an output bypass block |
