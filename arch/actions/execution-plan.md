@@ -31,7 +31,7 @@ compare against it. Output mapping is only relevant for output-rail bypasses.
 
 ## Phase 0: Baseline And Matrix
 
-Status: mostly complete.
+Status: complete for the current library rail inventory.
 
 Deliverables:
 
@@ -43,6 +43,7 @@ Deliverables:
 Artifacts:
 
 - `arch/actions/offline-flow-gate-matrix.md`
+- `arch/actions/equivalence-coverage-matrix.md`
 - `tests/test_output_mapping_rail_outcome_equivalence.py`
 - `tests/test_runtime_flow_gate_equivalence.py`
 
@@ -73,6 +74,8 @@ Deliverables:
 
 Already covered:
 
+- `content safety check input`
+- `content safety check output`
 - `self check input`
 - `self check output`
 - `self check facts`
@@ -132,7 +135,6 @@ Already covered:
 - `autoalign check output`
 - `injection detection` with `reject`
 - `injection detection` with `omit`
-- `content safety check output`
 - `topic safety check input`
 - `jailbreak detection heuristics`
 - `jailbreak detection model`
@@ -225,7 +227,7 @@ Deliverables:
 
 - `RailOutcome.transform(...)` fixture rows.
 - Runtime classifier that observes transformed input, output, or context vars
-  without relying only on assistant content.
+  without relying only on assistant content or expected fixture decisions.
 - Block wins over transform when both are present.
 - API fallback rows where vendors fail open.
 
@@ -280,6 +282,8 @@ Deliverables:
 
 - Replace `output_mapping` and `default_output_mapping` decisions with
   `RailOutcome` interpretation.
+- Add focused runtime equivalence coverage for the actual streaming and
+  parallel bypass paths while making that replacement.
 - Preserve tuple unwrapping where the bypass currently depends on it, or prove
   it is unnecessary.
 - Remove mapping registration once every caller has moved.
@@ -364,5 +368,6 @@ Continue with implementation now that Phase 1, Phase 2, and Phase 4 are pinned:
 1. Add parser/action unit coverage that explains the raw return shapes used by
    the fixture matrix.
 2. Tighten or introduce `RailOutcome` interpreters rail family by rail family.
-3. Replace the output bypass decision path with `RailOutcome`.
+3. Replace the output bypass decision path with `RailOutcome`, closing the
+   streaming/parallel runtime-equivalence gap recorded in the coverage matrix.
 4. Commit each slice before moving to the next family.
