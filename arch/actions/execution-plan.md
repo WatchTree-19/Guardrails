@@ -106,6 +106,10 @@ Already covered:
 - `crowdstrike aidr guard output`
 - `protect prompt`
 - `protect response`
+- `autoalign check input`
+- `autoalign check output`
+- `injection detection` with `reject`
+- `injection detection` with `omit`
 - `content safety check output`
 - `topic safety check input`
 - `jailbreak detection heuristics`
@@ -113,7 +117,8 @@ Already covered:
 
 Next tasks:
 
-1. Add remaining transform rails after that.
+1. Add remaining retrieval transform rows for `regex` and `hf_classifier`.
+2. Add score and adjudication rows for the remaining vendor rails.
 
 Gate:
 
@@ -139,8 +144,8 @@ Deliverables:
 
 Next tasks:
 
-1. Add explicit divergence rows for guardrails_ai, clavata, and
-   injection_detection.
+1. Add explicit divergence rows for guardrails_ai, clavata, and the remaining
+   score/adjudication mappings.
 
 Gate:
 
@@ -333,8 +338,7 @@ Gate:
 
 Continue Phase 1 and Phase 2 together for the next small slice:
 
-1. Add remaining runtime transform rows for `autoalign` and
-   `injection_detection`.
-2. Add output bypass divergence rows for the remaining known divergent mappings.
+1. Add retrieval transform rows for `regex` and `hf_classifier`.
+2. Add the next score/adjudication rail family after that.
 3. Run the focused test files.
 4. Commit that slice before moving to the next rail family.
