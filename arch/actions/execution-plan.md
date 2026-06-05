@@ -53,7 +53,7 @@ Gate:
 
 ## Phase 1: Runtime Flow Oracle Harness
 
-Status: in progress.
+Status: complete for current library gate coverage.
 
 Goal:
 
@@ -139,7 +139,8 @@ Already covered:
 
 Next tasks:
 
-1. Add score and adjudication rows for the remaining vendor rails.
+1. Keep new rails on this matrix as they are added.
+2. Keep warning-only render flows separate from gate equivalence.
 
 Gate:
 
@@ -148,7 +149,7 @@ Gate:
 
 ## Phase 2: Output Bypass Equivalence
 
-Status: started.
+Status: complete for current output bypass coverage.
 
 Goal:
 
@@ -165,8 +166,8 @@ Deliverables:
 
 Next tasks:
 
-1. Add explicit divergence rows for guardrails_ai, clavata, and the remaining
-   score/adjudication mappings.
+1. Keep new output mappings on this matrix as they are added.
+2. Delete mappings only after the bypass path reads `RailOutcome`.
 
 Gate:
 
@@ -204,7 +205,7 @@ Gate:
 
 ## Phase 4: Expand To Transform Rails
 
-Status: not started.
+Status: complete for current transform gate coverage.
 
 Goal:
 
@@ -357,8 +358,10 @@ Gate:
 
 ## Immediate Next Phase
 
-Continue Phase 1 and Phase 2 together for the next small slice:
+Continue with implementation now that Phase 1, Phase 2, and Phase 4 are pinned:
 
-1. Add the next score/adjudication rail family.
-3. Run the focused test files.
-4. Commit that slice before moving to the next rail family.
+1. Add parser/action unit coverage that explains the raw return shapes used by
+   the fixture matrix.
+2. Tighten or introduce `RailOutcome` interpreters rail family by rail family.
+3. Replace the output bypass decision path with `RailOutcome`.
+4. Commit each slice before moving to the next family.
