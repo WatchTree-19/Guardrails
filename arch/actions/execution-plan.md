@@ -298,7 +298,8 @@ Known points:
 
 - `guardrails_ai_validation_mapping` polarity was reversed relative to the
   normal flow gate. Fixed in the Guardrails AI mapping slice.
-- `patronus api check output` is missing `abort`; owner ruling says to fix it.
+- `patronus api check output` was missing `abort`; fixed in the Patronus API
+  flow slice.
 - `autoalign_groundedness_output_api` and `autoalign_factcheck_output_api`
   mappings block on scores while current flows do not.
 - `activefence` and `gcp_moderate_text` simple flows can disagree with detailed
