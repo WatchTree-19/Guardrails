@@ -76,6 +76,7 @@ Already covered:
 - `self check input`
 - `self check output`
 - `self check facts`
+- `alignscore check facts`
 - `content safety check output`
 - `topic safety check input`
 - `jailbreak detection heuristics`
@@ -83,10 +84,9 @@ Already covered:
 
 Next tasks:
 
-1. Add `factchecking/align_score`.
-2. Add `hf_classifier` input and output.
-3. Add `llama_guard` input and output.
-4. Add `policyai` input and output.
+1. Add `hf_classifier` input and output.
+2. Add `llama_guard` input and output.
+3. Add `policyai` input and output.
 
 Gate:
 
@@ -112,9 +112,8 @@ Deliverables:
 
 Next tasks:
 
-1. Add score threshold rows for facts and align score.
-2. Add dict rows for llama guard and regex.
-3. Add explicit divergence rows for guardrails_ai, clavata, pangea,
+1. Add dict rows for llama guard and regex.
+2. Add explicit divergence rows for guardrails_ai, clavata, pangea,
    crowdstrike_aidr, and injection_detection.
 
 Gate:
@@ -308,7 +307,7 @@ Gate:
 
 Continue Phase 1 and Phase 2 together for the next small slice:
 
-1. Add `factchecking/align_score` runtime oracle cases.
-2. Add facts and align score output bypass threshold rows.
+1. Add `hf_classifier` input and output runtime oracle cases.
+2. Add `hf_classifier` output mapping rows.
 3. Run the focused test files.
 4. Commit that slice before moving to the next rail family.
