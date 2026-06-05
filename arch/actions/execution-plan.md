@@ -91,9 +91,15 @@ Already covered:
 - `gliner detect pii on output`
 - `detect sensitive data on input`
 - `detect sensitive data on output`
+- `mask pii on input`
 - `mask pii on output`
+- `mask pii on retrieval`
+- `gliner mask pii on input`
 - `gliner mask pii on output`
+- `gliner mask pii on retrieval`
+- `mask sensitive data on input`
 - `mask sensitive data on output`
+- `mask sensitive data on retrieval`
 - `content safety check output`
 - `topic safety check input`
 - `jailbreak detection heuristics`
@@ -101,8 +107,9 @@ Already covered:
 
 Next tasks:
 
-1. Add input and retrieval transform observability.
-2. Add remaining transform rails after observability is proven.
+1. Add block-or-transform vendor rails: `pangea`, `crowdstrike_aidr`, and
+   `prompt_security`.
+2. Add remaining transform rails after that.
 
 Gate:
 
@@ -322,8 +329,8 @@ Gate:
 
 Continue Phase 1 and Phase 2 together for the next small slice:
 
-1. Add transform observability helpers for input and retrieval.
-2. Add mask input and retrieval rows for `privateai`, `gliner`, and
-   `sensitive_data_detection`.
+1. Add block-or-transform runtime rows for `pangea`, `crowdstrike_aidr`, and
+   `prompt_security`.
+2. Add output bypass divergence rows for those rails.
 3. Run the focused test files.
 4. Commit that slice before moving to the next rail family.
