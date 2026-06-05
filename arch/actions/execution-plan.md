@@ -91,6 +91,9 @@ Already covered:
 - `gliner detect pii on output`
 - `detect sensitive data on input`
 - `detect sensitive data on output`
+- `mask pii on output`
+- `gliner mask pii on output`
+- `mask sensitive data on output`
 - `content safety check output`
 - `topic safety check input`
 - `jailbreak detection heuristics`
@@ -98,7 +101,8 @@ Already covered:
 
 Next tasks:
 
-1. Add transform rails after transform observability is proven.
+1. Add input and retrieval transform observability.
+2. Add remaining transform rails after observability is proven.
 
 Gate:
 
@@ -318,8 +322,8 @@ Gate:
 
 Continue Phase 1 and Phase 2 together for the next small slice:
 
-1. Add transform observability helpers for input, output, and retrieval.
-2. Add mask transform rows for `privateai`, `gliner`, and
+1. Add transform observability helpers for input and retrieval.
+2. Add mask input and retrieval rows for `privateai`, `gliner`, and
    `sensitive_data_detection`.
 3. Run the focused test files.
 4. Commit that slice before moving to the next rail family.
