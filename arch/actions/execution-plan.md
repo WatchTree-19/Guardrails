@@ -89,6 +89,11 @@ Already covered:
 - `cleanlab trustworthiness`
 - `ai defense inspect prompt`
 - `ai defense inspect response`
+- `clavata check input`
+- `clavata check output`
+- `fiddler user safety`
+- `fiddler bot safety`
+- `fiddler bot faithfulness`
 - `regex check input`
 - `regex check output`
 - `regex check retrieval`
