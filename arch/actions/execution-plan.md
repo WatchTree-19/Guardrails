@@ -239,7 +239,7 @@ Gate:
 
 ## Phase 5: Implement Or Tighten Interpreters
 
-Status: started for clean rails, incomplete overall.
+Status: `llama_guard` template slice in review; incomplete overall.
 
 Goal:
 
@@ -254,7 +254,7 @@ Deliverables:
 
 Order:
 
-1. `llama_guard` as the end-to-end migration template.
+1. Review the `llama_guard` end-to-end migration template.
 2. Existing `RailOutcome` rails: content safety, topic safety, jailbreak.
 3. Boolean allowed rails: self-check, hf_classifier.
 4. Score threshold rails: facts, align score, cleanlab.
