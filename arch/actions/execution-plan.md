@@ -11,7 +11,8 @@ rail, with `RailOutcome` as the single Python decision result.
 - Each phase should end with focused tests and a focused commit.
 - Do not use vendor credentials as the correctness bar.
 - VCR replay is nice extra coverage only where stable cassettes already exist.
-- Parser and action unit tests stay separate from runtime flow equivalence.
+- Parser and action unit tests stay separate from runtime flow equivalence and
+  are added inside each rail migration, not as a standalone proof layer.
 - Streaming and parallel output bypass tests stay separate because they do not
   run the normal Colang flow path.
 - Adjudication cases are made explicit. Do not hide divergence by preserving the
@@ -176,34 +177,34 @@ Gate:
 - Output bypass tests document the intended delete path for every mapping.
 - No input rail test compares against `output_mapping`.
 
-## Phase 3: Parser And Action Unit Coverage
+## Phase 3: Per-Rail Action Characterization
 
-Status: in progress.
+Status: folded into migration slices.
 
 Goal:
 
-Keep raw vendor parsing and action behavior covered without mixing that coverage
-with flow gate proof.
+Cover raw vendor parsing, malformed values, and fallback behavior only where it
+matters for the rail currently being migrated.
 
 Deliverables:
 
-- Parser tests for raw vendor payloads into action raw returns or
-  `RailOutcome`.
-- Action tests for fail-open, fail-closed, fallback, and metadata behavior.
+- Action tests for fail-open, fail-closed, fallback, and metadata behavior when
+  that behavior is part of the migrated rail's verdict logic.
+- Shared fixture constants between migration tests and the runtime matrix where
+  that prevents drift.
 - No live credentials.
 - No runtime Colang assertions in these tests.
 
 Next tasks:
 
-1. Add parser rows for jailbreak cached raw values.
-2. Add parser rows for content safety policy violations.
-3. Add parser rows for llama guard missing and malformed values.
-4. Add action fallback tests for API-error rails.
+1. Add `llama_guard` malformed and fallback rows as part of the `llama_guard`
+   `RailOutcome` migration.
+2. Add fallback tests for API-error rails as each rail is migrated.
 
 Gate:
 
-- Parser/action tests explain raw return shapes used by the runtime fixture
-  matrix.
+- Each migrated rail has local action characterization for behavior that is not
+  already covered.
 
 ## Phase 4: Expand To Transform Rails
 
@@ -253,12 +254,13 @@ Deliverables:
 
 Order:
 
-1. Existing `RailOutcome` rails: content safety, topic safety, jailbreak.
-2. Boolean allowed rails: self-check, hf_classifier.
-3. Score threshold rails: facts, align score, cleanlab.
-4. Dict flag rails: llama guard, regex, policyai.
-5. Vendor object rails: trend_micro, activefence, gcp_moderate_text.
-6. Transform rails.
+1. `llama_guard` as the end-to-end migration template.
+2. Existing `RailOutcome` rails: content safety, topic safety, jailbreak.
+3. Boolean allowed rails: self-check, hf_classifier.
+4. Score threshold rails: facts, align score, cleanlab.
+5. Dict flag rails: regex, policyai.
+6. Vendor object rails: trend_micro, activefence, gcp_moderate_text.
+7. Transform rails.
 
 Gate:
 
@@ -267,7 +269,7 @@ Gate:
 
 ## Phase 6: Remove `output_mapping`
 
-Status: not started.
+Status: started with the `RailOutcome`-aware bypass seam.
 
 Goal:
 
@@ -282,8 +284,10 @@ Deliverables:
 
 - Replace `output_mapping` and `default_output_mapping` decisions with
   `RailOutcome` interpretation.
+- Keep the bypass RailOutcome-aware while falling back to legacy
+  `output_mapping` for not-yet-migrated raw returns.
 - Add focused runtime equivalence coverage for the actual streaming and
-  parallel bypass paths while making that replacement.
+  parallel bypass paths while replacing each legacy fallback.
 - Preserve tuple unwrapping where the bypass currently depends on it, or prove
   it is unnecessary.
 - Remove mapping registration once every caller has moved.
@@ -363,11 +367,12 @@ Gate:
 
 ## Immediate Next Phase
 
-Continue with implementation now that Phase 1, Phase 2, and Phase 4 are pinned:
+Continue with migration now that Phase 1, Phase 2, and Phase 4 are pinned:
 
-1. Add parser/action unit coverage that explains the raw return shapes used by
-   the fixture matrix.
-2. Tighten or introduce `RailOutcome` interpreters rail family by rail family.
-3. Replace the output bypass decision path with `RailOutcome`, closing the
+1. Keep the output bypass RailOutcome-aware with legacy raw-return fallback.
+2. Migrate `llama_guard` end to end as the template, including its local
+   malformed/fallback characterization.
+3. Tighten or introduce `RailOutcome` interpreters rail family by rail family.
+4. Replace the output bypass decision path with `RailOutcome`, closing the
    streaming/parallel runtime-equivalence gap recorded in the coverage matrix.
-4. Commit each slice before moving to the next family.
+5. Commit each slice before moving to the next family.

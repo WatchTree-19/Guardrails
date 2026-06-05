@@ -83,8 +83,11 @@ actual per-chunk or parallel bypass runtime path is not yet equivalence-pinned.
 
 The normal Colang flow decision source is covered for the current library gate
 rails, including block/allow and transform. Legacy output mapping is covered at
-unit level, including tuple unwrapping and transform lossiness.
+unit level, including tuple unwrapping and transform lossiness. The streaming
+and parallel bypass helpers now read `RailOutcome` directly before falling back
+to legacy `output_mapping`, with focused runtime coverage for both bypass sites.
 
 The remaining equivalence gap is runtime coverage for the actual
-streaming/parallel bypass path. Phase 6 should close that gap while replacing
-`output_mapping` with `RailOutcome`.
+streaming/parallel bypass path for each legacy raw-return fallback. Phase 6
+should close that rail by rail while replacing `output_mapping` with
+`RailOutcome`.
