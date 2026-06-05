@@ -84,6 +84,11 @@ Already covered:
 - `llama guard check output`
 - `policyai moderation on input`
 - `policyai moderation on output`
+- `trend ai guard input`
+- `trend ai guard output`
+- `cleanlab trustworthiness`
+- `ai defense inspect prompt`
+- `ai defense inspect response`
 - `regex check input`
 - `regex check output`
 - `regex check retrieval`
