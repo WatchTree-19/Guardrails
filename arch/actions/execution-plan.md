@@ -99,6 +99,11 @@ Already covered:
 - `activefence moderation on input detailed`
 - `gcpnlp moderation`
 - `gcpnlp moderation detailed`
+- `guardrailsai check input`
+- `guardrailsai check output`
+- `patronus lynx check output hallucination`
+- `patronus api check output`
+- `self check hallucination`
 - `regex check input`
 - `regex check output`
 - `regex check retrieval`
