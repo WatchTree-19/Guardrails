@@ -296,8 +296,8 @@ Status: not started.
 
 Known points:
 
-- `guardrails_ai_validation_mapping` polarity is reversed relative to the normal
-  flow gate.
+- `guardrails_ai_validation_mapping` polarity was reversed relative to the
+  normal flow gate. Fixed in the Guardrails AI mapping slice.
 - `patronus api check output` is missing `abort`; owner ruling says to fix it.
 - `autoalign_groundedness_output_api` and `autoalign_factcheck_output_api`
   mappings block on scores while current flows do not.
