@@ -79,6 +79,12 @@ Already covered:
 - `alignscore check facts`
 - `hf classifier check input`
 - `hf classifier check output`
+- `llama guard check input`
+- `llama guard check output`
+- `policyai moderation on input`
+- `policyai moderation on output`
+- `regex check input`
+- `regex check output`
 - `content safety check output`
 - `topic safety check input`
 - `jailbreak detection heuristics`
@@ -86,8 +92,9 @@ Already covered:
 
 Next tasks:
 
-1. Add `llama_guard` input and output.
-2. Add `policyai` input and output.
+1. Add PII detect input and output rails for `privateai`, `gliner`, and
+   `sensitive_data_detection`.
+2. Add transform rails after transform observability is proven.
 
 Gate:
 
@@ -113,8 +120,7 @@ Deliverables:
 
 Next tasks:
 
-1. Add dict rows for llama guard and regex.
-2. Add explicit divergence rows for guardrails_ai, clavata, pangea,
+1. Add explicit divergence rows for guardrails_ai, clavata, pangea,
    crowdstrike_aidr, and injection_detection.
 
 Gate:
@@ -308,7 +314,7 @@ Gate:
 
 Continue Phase 1 and Phase 2 together for the next small slice:
 
-1. Add `llama_guard` input and output runtime oracle cases.
-2. Add `llama_guard` output mapping dict rows.
+1. Add PII detect input and output runtime oracle cases.
+2. Add PII detect output mapping rows.
 3. Run the focused test files.
 4. Commit that slice before moving to the next rail family.
