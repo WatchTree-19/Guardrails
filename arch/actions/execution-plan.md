@@ -262,6 +262,12 @@ Order:
 6. Vendor object rails: trend_micro, activefence, gcp_moderate_text.
 7. Transform rails.
 
+Replication rule:
+
+- Copy the `llama_guard` shape for dict and boolean rails.
+- Stop and flag transform rails before migration; those require the
+  `RailOutcome.transform` contract rather than the block/allow template.
+
 Gate:
 
 - Each interpreter is covered by runtime flow oracle tests or by an explicit
