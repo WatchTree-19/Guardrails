@@ -73,9 +73,9 @@ actual per-chunk or parallel bypass runtime path is not yet equivalence-pinned.
 | `patronus_api_output` | covered | covered | gap: unit only | none | missing flow abort fixed; failed checks now block |
 | `self_check_hallucination` | covered | covered | gap: unit only | none | blocking flow covered |
 | `hallucination_warning` | separate render flow | N/A | N/A | none | same action has warning-only and blocking consequences -> interpreter must be flow-aware |
-| `trend_micro_input` | covered | N/A | N/A | none | none |
-| `trend_micro_output` | covered | covered | gap: unit only | none | none |
-| `cleanlab_output` | covered | covered | gap: unit only | none | none |
+| `trend_micro_input` | covered | N/A | N/A | none | migrated to `RailOutcome`; reason preserved for exception rendering |
+| `trend_micro_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; reason preserved for exception rendering |
+| `cleanlab_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; score preserved in trustworthiness metadata |
 | `ai_defense_input` | covered | N/A | N/A | none | none |
 | `ai_defense_output` | covered | covered | gap: unit only | none | mapping fail-closed defaults are pinned |
 

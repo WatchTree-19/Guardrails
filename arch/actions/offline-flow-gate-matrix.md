@@ -55,8 +55,8 @@ Use these families to generate per-rail synthetic raw returns.
 | `sensitive_data_detection` | `response.is_blocked` gates input/output/retrieval detect rails; mask flows rewrite text. | None for detect output after migration; bypass reads `RailOutcome` directly. | Clean `RailOutcome` for detect plus transform masks. | Detect `RailOutcome.allow()`, `RailOutcome.block()`; mask input/output/retrieval with changed and unchanged text remains deferred until transform contract. |
 | `regex` | `result["is_match"]` gates input/output; retrieval match clears chunks. | `result.get("is_match", False)`. | Dict flag plus retrieval transform. | Deferred until transform contract because one action has block consequences for input/output and a transform consequence for retrieval. |
 | `policyai` | `result.is_blocked` gates input/output; render metadata preserves category and exception message. | None after migration; bypass reads `RailOutcome` directly. | Clean `RailOutcome` with metadata. | `RailOutcome.allow(**safe_metadata)`, `RailOutcome.block(**unsafe_metadata)`. |
-| `trend_micro` | `result.blocked` gates input/output and API errors fail open except missing API key returns block. | `result.action.lower() == "block"`. | Clean object flag with API fallback. | `GuardResult(action="Allow")`, `GuardResult(action="Block")`, API error allow fallback, missing key block fallback. |
-| `cleanlab` | `trustworthiness_score < 0.6` gates output. | Same threshold with missing default `1`. | Clean score threshold. | `score_min_0_6`; missing score adjudication. |
+| `trend_micro` | `result.is_blocked` gates input/output and API errors fail open except missing API key returns block. | None after migration; bypass reads `RailOutcome` directly. | Clean `RailOutcome` with action metadata and reason. | `RailOutcome.allow(reason=..., action="Allow")`, `RailOutcome.block(reason=..., action="Block")`, API error allow fallback, missing key block fallback. |
+| `cleanlab` | `result.is_blocked` gates output. | None after migration; bypass reads `RailOutcome` directly. | Clean `RailOutcome` with trustworthiness metadata. | `RailOutcome.block(trustworthiness_score=0.59)`, `RailOutcome.allow(trustworthiness_score=0.6/0.61)`. |
 | `ai_defense` | `result["is_blocked"]` gates prompt/response. | `None` or missing `is_blocked` fail closed. | Dict flag with fail-closed divergence. | `dict_flag("is_blocked")`; explicit `None` and missing key adjudication. |
 | `prompt_security` | `is_blocked` blocks; else `is_modified` rewrites prompt/response. | Missing `is_blocked` defaults to block. | Block or transform. | `is_blocked=false/is_modified=false`; `is_blocked=true`; `is_blocked=false/is_modified=true`; both true means block wins; missing key adjudication. |
 | `autoalign` | `guardrails_triggered` blocks; else `pii.guarded` rewrites input/output. Groundedness and factcheck flows call actions but do not gate on score. | Output maps `guardrails_triggered`; groundedness and factcheck mappings block on score `< 0.5`. | Block or transform, plus score divergence. | `guardrails_triggered=false/pii.guarded=false`; `guardrails_triggered=true`; `guardrails_triggered=false/pii.guarded=true`; score `0.49/0.5/0.51` must be adjudicated because flow does not block. |
@@ -95,7 +95,7 @@ Use these families to generate per-rail synthetic raw returns.
 Start with rails where the decision is clean and the fixture count is small:
 
 1. `content_safety`, `topic_safety`, `jailbreak_detection`
-2. `trend_micro`, `cleanlab`, `ai_defense`
+2. `ai_defense`
 
 After those pass, add the transform rails:
 
