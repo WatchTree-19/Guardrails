@@ -94,6 +94,11 @@ Already covered:
 - `fiddler user safety`
 - `fiddler bot safety`
 - `fiddler bot faithfulness`
+- `activefence moderation on input`
+- `activefence moderation on output`
+- `activefence moderation on input detailed`
+- `gcpnlp moderation`
+- `gcpnlp moderation detailed`
 - `regex check input`
 - `regex check output`
 - `regex check retrieval`
