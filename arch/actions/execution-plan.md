@@ -239,7 +239,9 @@ Gate:
 
 ## Phase 5: Implement Or Tighten Interpreters
 
-Status: `llama_guard` template slice in review; incomplete overall.
+Status: in progress. The block/allow families and target-to-text transform
+families have migrated to `RailOutcome`; odd-shape and legacy output-mapping
+tails remain.
 
 Goal:
 
@@ -254,19 +256,22 @@ Deliverables:
 
 Order:
 
-1. Review the `llama_guard` end-to-end migration template.
-2. Existing `RailOutcome` rails: content safety, topic safety, jailbreak.
-3. Boolean allowed rails: self-check, hf_classifier.
-4. Score threshold rails: facts, align score, cleanlab.
-5. Dict flag rails: regex, policyai.
-6. Vendor object rails: trend_micro, activefence, gcp_moderate_text.
-7. Transform rails.
+1. Existing `RailOutcome` rails: content safety, topic safety, jailbreak.
+2. Boolean allowed rails: self-check, hf_classifier.
+3. Score threshold rails: facts, align score, cleanlab.
+4. Dict flag rails: regex, policyai.
+5. Vendor object rails: trend_micro, activefence, gcp_moderate_text.
+6. Target-to-text transform rails: pangea, PII masking, retrieval clears,
+   CrowdStrike AIDR, Prompt Security, AutoAlign PII rewrites, injection
+   omit/rewrite.
+7. Odd-shape or adjudication rails: autoalign score mappings, guardrails_ai,
+   patronus, hallucination warning.
 
 Replication rule:
 
 - Copy the `llama_guard` shape for dict and boolean rails.
-- Stop and flag transform rails before migration; those require the
-  `RailOutcome.transform` contract rather than the block/allow template.
+- Copy the pangea shape for target-to-text transform rails.
+- Stop and flag any transform that does not fit target-to-text rewrites.
 
 Gate:
 
@@ -376,9 +381,9 @@ Gate:
 Continue with migration now that Phase 1, Phase 2, and Phase 4 are pinned:
 
 1. Keep the output bypass RailOutcome-aware with legacy raw-return fallback.
-2. Migrate `llama_guard` end to end as the template, including its local
-   malformed/fallback characterization.
-3. Tighten or introduce `RailOutcome` interpreters rail family by rail family.
+2. Finish odd-shape and adjudication rails recorded in the coverage matrix.
+3. Tighten or introduce any remaining `RailOutcome` interpreters rail family by
+   rail family.
 4. Replace the output bypass decision path with `RailOutcome`, closing the
    streaming/parallel runtime-equivalence gap recorded in the coverage matrix.
 5. Commit each slice before moving to the next family.
