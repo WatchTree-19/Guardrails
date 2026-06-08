@@ -45,8 +45,8 @@ actual per-chunk or parallel bypass runtime path is not yet equivalence-pinned.
 | `topic_safety_input` | covered | N/A | N/A | none | none |
 | `jailbreak_heuristics_input` | covered | N/A | N/A | none | none |
 | `jailbreak_model_input` | covered | N/A | N/A | none | none |
-| `pangea_input` | covered | N/A | N/A | output_data | transform only; no output mapping path |
-| `pangea_output` | covered | default covered | gap: unit only | text | default object mapping allows block and transform -> replace with `RailOutcome` |
+| `pangea_input` | covered | N/A | N/A | output_data | migrated to plural `RailOutcome.transform`; rewrites both user and bot targets |
+| `pangea_output` | covered | N/A: mapping deleted | direct RailOutcome covered | text | migrated to plural `RailOutcome.transform`; streaming transform application remains unsupported |
 | `crowdstrike_aidr_input` | covered | N/A | N/A | output_data | transform only; no output mapping path |
 | `crowdstrike_aidr_output` | covered | default covered | gap: unit only | text | default object mapping allows block and transform -> replace with `RailOutcome` |
 | `prompt_security_input` | covered | N/A | N/A | output_data | transform only; no output mapping path |
@@ -90,4 +90,6 @@ to legacy `output_mapping`, with focused runtime coverage for both bypass sites.
 The remaining equivalence gap is runtime coverage for the actual
 streaming/parallel bypass path for each legacy raw-return fallback. Phase 6
 should close that rail by rail while replacing `output_mapping` with
-`RailOutcome`.
+`RailOutcome`. Transform-on-streaming is explicitly unsupported in this phase:
+streaming bypasses still observe transform outcomes as non-blocking and do not
+apply rewrites.

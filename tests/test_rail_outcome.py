@@ -14,6 +14,7 @@
 # limitations under the License.
 
 import dataclasses
+from typing import Any, cast
 
 import pytest
 
@@ -29,7 +30,8 @@ def test_allow_is_not_blocked():
     outcome = RailOutcome.allow()
     assert outcome.decision is RailDecision.ALLOW
     assert outcome.is_blocked is False
-    assert outcome.transform_spec is None
+    assert outcome.is_transform is False
+    assert outcome.transforms == ()
 
 
 def test_allow_carries_metadata():
@@ -41,32 +43,46 @@ def test_block_is_blocked_with_reason_and_metadata():
     outcome = RailOutcome.block(reason="unsafe", policy_violations=["S1: Violence"])
     assert outcome.decision is RailDecision.BLOCK
     assert outcome.is_blocked is True
+    assert outcome.is_transform is False
     assert outcome.reason == "unsafe"
     assert outcome.metadata == {"policy_violations": ["S1: Violence"]}
-    assert outcome.transform_spec is None
+    assert outcome.transforms == ()
 
 
-def test_transform_targets_a_variable():
-    outcome = RailOutcome.transform(TransformTarget.USER_MESSAGE, "masked text")
+def test_transform_targets_variables():
+    outcome = RailOutcome.transform(
+        [
+            (TransformTarget.USER_MESSAGE, "masked input"),
+            (TransformTarget.BOT_MESSAGE, "masked output"),
+        ]
+    )
     assert outcome.decision is RailDecision.TRANSFORM
     assert outcome.is_blocked is False
-    assert outcome.transform_spec == TransformSpec(target=TransformTarget.USER_MESSAGE, text="masked text")
+    assert outcome.is_transform is True
+    assert outcome.transforms == (
+        TransformSpec(target=TransformTarget.USER_MESSAGE, text="masked input"),
+        TransformSpec(target=TransformTarget.BOT_MESSAGE, text="masked output"),
+    )
+    assert outcome.transform_text == {
+        "user_message": "masked input",
+        "bot_message": "masked output",
+    }
 
 
 def test_transform_payload_required_for_transform_decision():
-    with pytest.raises(ValueError, match="transform_spec must be set if and only if decision is TRANSFORM"):
+    with pytest.raises(ValueError, match="transforms must be non-empty if and only if decision is TRANSFORM"):
         RailOutcome(decision=RailDecision.TRANSFORM)
 
 
 def test_transform_payload_forbidden_for_block_decision():
-    with pytest.raises(ValueError, match="transform_spec must be set if and only if decision is TRANSFORM"):
+    with pytest.raises(ValueError, match="transforms must be non-empty if and only if decision is TRANSFORM"):
         RailOutcome(
             decision=RailDecision.BLOCK,
-            transform_spec=TransformSpec(target=TransformTarget.USER_MESSAGE, text="x"),
+            transforms=(TransformSpec(target=TransformTarget.USER_MESSAGE, text="x"),),
         )
 
 
 def test_outcome_is_immutable():
     outcome = RailOutcome.allow()
     with pytest.raises(dataclasses.FrozenInstanceError):
-        outcome.decision = RailDecision.BLOCK
+        cast(Any, outcome).decision = RailDecision.BLOCK

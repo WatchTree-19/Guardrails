@@ -26,14 +26,16 @@ Fields:
 - ``reason``: optional neutral, human-readable explanation.
 - ``metadata``: neutral evidence the decision is based on (policy violations,
   categories, scores). Never load-bearing for the decision itself.
-- ``transform_spec``: for TRANSFORM, which conversation variable is rewritten
-  and to what.
+- ``transforms``: for TRANSFORM, which conversation variables are rewritten
+  and to what. Transform outcomes are non-streaming; streaming output bypasses
+  observe them as non-blocking and do not apply rewrites.
 
 Deliberately NOT here (they are rendering, not decision): exception type,
 refusal intent/message, language, and Colang event/context-update channels.
 A BLOCK always means "stop"; there is no soft-block flag.
 """
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
@@ -67,7 +69,7 @@ class TransformSpec:
 class RailOutcome:
     """The engine-neutral verdict of one rail check.
 
-    ``transform_spec`` is set if and only if ``decision`` is TRANSFORM. Each
+    ``transforms`` is non-empty if and only if ``decision`` is TRANSFORM. Each
     engine renders the consequence of a BLOCK its own way; this object does not
     encode it.
     """
@@ -75,16 +77,24 @@ class RailOutcome:
     decision: RailDecision
     reason: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
-    transform_spec: TransformSpec | None = None
+    transforms: tuple[TransformSpec, ...] = ()
 
     def __post_init__(self) -> None:
-        if (self.transform_spec is not None) != (self.decision is RailDecision.TRANSFORM):
-            raise ValueError("transform_spec must be set if and only if decision is TRANSFORM")
+        if bool(self.transforms) != (self.decision is RailDecision.TRANSFORM):
+            raise ValueError("transforms must be non-empty if and only if decision is TRANSFORM")
 
     @property
     def is_blocked(self) -> bool:
         """The single field both engines read to gate; rendering is theirs."""
         return self.decision is RailDecision.BLOCK
+
+    @property
+    def is_transform(self) -> bool:
+        return self.decision is RailDecision.TRANSFORM
+
+    @property
+    def transform_text(self) -> dict[str, str]:
+        return {spec.target.value: spec.text for spec in self.transforms}
 
     @classmethod
     def allow(cls, *, reason: str | None = None, **metadata: Any) -> "RailOutcome":
@@ -97,8 +107,7 @@ class RailOutcome:
     @classmethod
     def transform(
         cls,
-        target: TransformTarget,
-        text: str,
+        rewrites: Sequence[tuple[TransformTarget, str]],
         *,
         reason: str | None = None,
         **metadata: Any,
@@ -106,6 +115,6 @@ class RailOutcome:
         return cls(
             decision=RailDecision.TRANSFORM,
             reason=reason,
-            transform_spec=TransformSpec(target=target, text=text),
+            transforms=tuple(TransformSpec(target=target, text=text) for target, text in rewrites),
             metadata=dict(metadata),
         )
