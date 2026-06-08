@@ -239,9 +239,9 @@ Gate:
 
 ## Phase 5: Implement Or Tighten Interpreters
 
-Status: in progress. The block/allow families and target-to-text transform
-families have migrated to `RailOutcome`; odd-shape and legacy output-mapping
-tails remain.
+Status: complete for current library rails. The block/allow, threshold,
+target-to-text transform, and odd-shape/adjudication rails have migrated to
+`RailOutcome`.
 
 Goal:
 
@@ -264,7 +264,7 @@ Order:
 6. Target-to-text transform rails: pangea, PII masking, retrieval clears,
    CrowdStrike AIDR, Prompt Security, AutoAlign PII rewrites, injection
    omit/rewrite.
-7. Odd-shape or adjudication rails: autoalign score mappings, guardrails_ai,
+7. Odd-shape or adjudication rails: autoalign score rails, guardrails_ai,
    patronus, hallucination warning.
 
 Replication rule:
@@ -280,7 +280,8 @@ Gate:
 
 ## Phase 6: Remove `output_mapping`
 
-Status: started with the `RailOutcome`-aware bypass seam.
+Status: ready. Library rails no longer use `output_mapping`; the generic
+fallback/default mapping machinery remains.
 
 Goal:
 
@@ -295,8 +296,8 @@ Deliverables:
 
 - Replace `output_mapping` and `default_output_mapping` decisions with
   `RailOutcome` interpretation.
-- Keep the bypass RailOutcome-aware while falling back to legacy
-  `output_mapping` for not-yet-migrated raw returns.
+- Keep the bypass RailOutcome-aware while deleting legacy raw-return mapping
+  fallback behavior.
 - Add focused runtime equivalence coverage for the actual streaming and
   parallel bypass paths while replacing each legacy fallback.
 - Preserve tuple unwrapping where the bypass currently depends on it, or prove
@@ -308,6 +309,7 @@ Gate:
 - Runtime flow tests stay green.
 - Output bypass tests stay green.
 - Streaming and parallel bypass tests cover block and allow.
+- No library rail registers `output_mapping`.
 
 ## Phase 7: Fix Known Bugs And Adjudication Points
 
@@ -316,15 +318,16 @@ Status: not started.
 Known points:
 
 - `guardrails_ai_validation_mapping` polarity was reversed relative to the
-  normal flow gate. Fixed in the Guardrails AI mapping slice.
+  normal flow gate. Resolved by deleting the mapping and returning
+  `RailOutcome`.
 - `patronus api check output` was missing `abort`; fixed in the Patronus API
   flow slice.
 - `autoalign_groundedness_output_api` and `autoalign_factcheck_output_api`
-  mappings block on scores while current flows do not.
-- `activefence` and `gcp_moderate_text` simple flows can disagree with detailed
-  mapping thresholds.
-- `hallucination` uses one action for block and warning-only flows, so the
-  interpreter must be tied to configured consequence.
+  mappings blocked on scores while normal flows did not. Resolved by returning
+  `RailOutcome` and gating the flows on the same threshold verdict.
+- `hallucination` uses one action for block and warning-only flows. Resolved by
+  returning `RailOutcome` from the action while keeping the consequence in each
+  flow.
 
 Gate:
 
@@ -378,12 +381,14 @@ Gate:
 
 ## Immediate Next Phase
 
-Continue with migration now that Phase 1, Phase 2, and Phase 4 are pinned:
+Continue with global `output_mapping` removal now that library rails all return
+`RailOutcome`:
 
-1. Keep the output bypass RailOutcome-aware with legacy raw-return fallback.
-2. Finish odd-shape and adjudication rails recorded in the coverage matrix.
-3. Tighten or introduce any remaining `RailOutcome` interpreters rail family by
-   rail family.
-4. Replace the output bypass decision path with `RailOutcome`, closing the
-   streaming/parallel runtime-equivalence gap recorded in the coverage matrix.
+1. Delete the generic legacy raw-return fallback/default mapping path from the
+   output bypass helpers.
+2. Keep direct `RailOutcome` handling in both streaming and parallel bypass
+   paths.
+3. Update or delete tests that only characterize legacy `output_mapping`.
+4. Preserve standalone decorator metadata tests only if `output_mapping` remains
+   public API; otherwise remove the parameter and its tests.
 5. Commit each slice before moving to the next family.

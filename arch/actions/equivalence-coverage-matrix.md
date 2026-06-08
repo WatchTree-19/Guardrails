@@ -53,8 +53,8 @@ actual per-chunk or parallel bypass runtime path is not yet equivalence-pinned.
 | `prompt_security_output` | covered | N/A: mapping deleted | direct RailOutcome covered | text | migrated to `RailOutcome`; streaming transform application remains unsupported |
 | `autoalign_input` | covered | N/A | N/A | output_data | block wins over PII transform |
 | `autoalign_output` | covered | N/A: mapping deleted | direct RailOutcome covered | text | migrated to `RailOutcome`; streaming transform application remains unsupported |
-| `autoalign_groundedness_output_api` | N/A: flow does not gate on mapping verdict | covered | gap: unit only | none | mapping blocks on score while flow only calls action -> owner decision pending |
-| `autoalign_factcheck_output_api` | N/A: flow does not gate on mapping verdict | covered | gap: unit only | none | mapping blocks on score while flow only calls action -> owner decision pending |
+| `autoalign_groundedness_output_api` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; score below threshold now gates the normal flow too; Colang 2 flow corrected to call the groundedness action |
+| `autoalign_factcheck_output_api` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; score below threshold now gates the normal flow too |
 | `injection_detection_reject` | covered | N/A: default bypass replaced | direct RailOutcome covered | text | migrated to `RailOutcome`; reject blocks injections and transforms non-injection rewrites |
 | `injection_detection_omit` | covered | N/A: default bypass replaced | direct RailOutcome covered | text | migrated to `RailOutcome.transform`; streaming transform application remains unsupported |
 | `clavata_input` | covered | N/A | N/A | none | migrated to `RailOutcome` |
@@ -68,11 +68,11 @@ actual per-chunk or parallel bypass runtime path is not yet equivalence-pinned.
 | `gcp_moderation_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; simple output threshold preserved |
 | `gcp_moderation_output_detailed` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; detailed threshold evidence preserved in metadata |
 | `guardrails_ai_input` | covered | N/A | N/A | none | mapping polarity bug was output-only |
-| `guardrails_ai_output` | covered | covered | gap: unit only | none | mapping polarity fixed to match flow |
-| `patronus_lynx_output` | covered | covered | gap: unit only | none | none |
-| `patronus_api_output` | covered | covered | gap: unit only | none | missing flow abort fixed; failed checks now block |
-| `self_check_hallucination` | covered | covered | gap: unit only | none | blocking flow covered |
-| `hallucination_warning` | separate render flow | N/A | N/A | none | same action has warning-only and blocking consequences -> interpreter must be flow-aware |
+| `guardrails_ai_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; mapping polarity removed |
+| `patronus_lynx_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; no-context fallback remains allow |
+| `patronus_api_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; missing flow abort fixed; failed checks block |
+| `self_check_hallucination` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; blocking flow covered |
+| `hallucination_warning` | separate render flow | N/A | N/A | none | same `RailOutcome.block` detection renders as warning-only in this flow |
 | `trend_micro_input` | covered | N/A | N/A | none | migrated to `RailOutcome`; reason preserved for exception rendering |
 | `trend_micro_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; reason preserved for exception rendering |
 | `cleanlab_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; score preserved in trustworthiness metadata |
@@ -82,16 +82,16 @@ actual per-chunk or parallel bypass runtime path is not yet equivalence-pinned.
 ## Phase Status
 
 The normal Colang flow decision source is covered for the current library gate
-rails, including block/allow and transform. Legacy output mapping is covered at
-unit level, including tuple unwrapping and transform lossiness. The streaming
-and parallel bypass helpers now read `RailOutcome` directly before falling back
-to legacy `output_mapping`, with focused runtime coverage for both bypass sites.
+rails, including block/allow and transform. Former output-mapping rails are
+covered as direct `RailOutcome` bypass reads, including tuple unwrapping and
+transform lossiness. The streaming and parallel bypass helpers now read
+`RailOutcome` directly, with focused runtime coverage for both bypass sites.
 
 The transform queue is migrated for the target -> text rewrite rails: pangea,
 PII masking, HF retrieval clearing, regex retrieval clearing, CrowdStrike AIDR,
-Prompt Security, AutoAlign PII rewrites, and injection omit/rewrite. The
-remaining equivalence gap is runtime coverage for the actual streaming/parallel
-bypass path for each legacy raw-return fallback that still has an output
-mapping. Transform-on-streaming is explicitly unsupported in this phase:
-streaming bypasses observe transform outcomes as non-blocking and do not apply
-rewrites.
+Prompt Security, AutoAlign PII rewrites, and injection omit/rewrite. No library
+rail still registers a legacy `output_mapping`. The remaining equivalence work
+is deleting the generic legacy fallback/default mapping machinery after the
+streaming and parallel bypass paths are kept on direct `RailOutcome` reads.
+Transform-on-streaming is explicitly unsupported in this phase: streaming
+bypasses observe transform outcomes as non-blocking and do not apply rewrites.
