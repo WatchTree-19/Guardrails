@@ -40,8 +40,8 @@ actual per-chunk or parallel bypass runtime path is not yet equivalence-pinned.
 | `sensitive_data_mask_input` | covered | N/A | N/A | output_data | transform only; no output mapping path |
 | `sensitive_data_mask_output` | covered | default covered | gap: unit only | text | default string mapping cannot express transform -> replace with `RailOutcome` |
 | `sensitive_data_mask_retrieval` | covered | N/A | N/A | output_data | transform only; no output mapping path |
-| `content_safety_input` | covered | N/A | N/A | none | none |
-| `content_safety_output` | covered | covered | behavioral covered; equivalence gap | none | none |
+| `content_safety_input` | covered | N/A | N/A | none | migrated to `RailOutcome` |
+| `content_safety_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; bypass reads outcome directly |
 | `topic_safety_input` | covered | N/A | N/A | none | none |
 | `jailbreak_heuristics_input` | covered | N/A | N/A | none | none |
 | `jailbreak_model_input` | covered | N/A | N/A | none | none |
@@ -57,16 +57,16 @@ actual per-chunk or parallel bypass runtime path is not yet equivalence-pinned.
 | `autoalign_factcheck_output_api` | N/A: flow does not gate on mapping verdict | covered | gap: unit only | none | mapping blocks on score while flow only calls action -> owner decision pending |
 | `injection_detection_reject` | covered | default covered | gap: unit only | text | default dict mapping allows block and transform -> replace with `RailOutcome` |
 | `injection_detection_omit` | covered | default covered | gap: unit only | text | default dict mapping allows transform -> replace with `RailOutcome` |
-| `clavata_input` | covered | N/A | N/A | none | none |
-| `clavata_output` | covered | default covered | gap: unit only | none | default boolean mapping inverts flow polarity -> replace with `RailOutcome` |
-| `fiddler_user_safety` | covered | N/A | N/A | none | none |
-| `fiddler_bot_safety` | covered | default covered | gap: unit only | none | default boolean mapping inverts flow polarity -> replace with `RailOutcome` |
-| `fiddler_bot_faithfulness` | covered | default covered | gap: unit only | none | default boolean mapping inverts flow polarity -> replace with `RailOutcome` |
-| `activefence_input` | covered | N/A | N/A | none | none |
-| `activefence_output` | covered | covered | gap: unit only | none | detailed category mapping can block when simple output flow allows -> owner decision pending |
-| `activefence_input_detailed` | covered | N/A | N/A | none | none |
-| `gcp_moderation_output` | covered | covered | gap: unit only | none | detailed category mapping can block when simple output flow allows -> owner decision pending |
-| `gcp_moderation_output_detailed` | covered | covered | gap: unit only | none | detailed flow and mapping agree on category thresholds |
+| `clavata_input` | covered | N/A | N/A | none | migrated to `RailOutcome` |
+| `clavata_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; default boolean inversion removed |
+| `fiddler_user_safety` | covered | N/A | N/A | none | migrated to `RailOutcome` |
+| `fiddler_bot_safety` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; default boolean inversion removed |
+| `fiddler_bot_faithfulness` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; default boolean inversion removed |
+| `activefence_input` | covered | N/A | N/A | none | migrated to `RailOutcome`; simple threshold mode pinned |
+| `activefence_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; simple output threshold preserved |
+| `activefence_input_detailed` | covered | N/A | N/A | none | migrated to `RailOutcome`; detailed threshold evidence preserved in metadata |
+| `gcp_moderation_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; simple output threshold preserved |
+| `gcp_moderation_output_detailed` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; detailed threshold evidence preserved in metadata |
 | `guardrails_ai_input` | covered | N/A | N/A | none | mapping polarity bug was output-only |
 | `guardrails_ai_output` | covered | covered | gap: unit only | none | mapping polarity fixed to match flow |
 | `patronus_lynx_output` | covered | covered | gap: unit only | none | none |
@@ -76,8 +76,8 @@ actual per-chunk or parallel bypass runtime path is not yet equivalence-pinned.
 | `trend_micro_input` | covered | N/A | N/A | none | migrated to `RailOutcome`; reason preserved for exception rendering |
 | `trend_micro_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; reason preserved for exception rendering |
 | `cleanlab_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; score preserved in trustworthiness metadata |
-| `ai_defense_input` | covered | N/A | N/A | none | none |
-| `ai_defense_output` | covered | covered | gap: unit only | none | mapping fail-closed defaults are pinned |
+| `ai_defense_input` | covered | N/A | N/A | none | migrated to `RailOutcome`; fail-open/fail-closed fallback pinned |
+| `ai_defense_output` | covered | N/A: mapping deleted | direct RailOutcome covered | none | migrated to `RailOutcome`; fail-open/fail-closed fallback pinned |
 
 ## Phase Status
 
