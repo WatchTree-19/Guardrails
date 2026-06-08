@@ -118,3 +118,11 @@ class RailOutcome:
             transforms=tuple(TransformSpec(target=target, text=text) for target, text in rewrites),
             metadata=dict(metadata),
         )
+
+
+def require_rail_outcome(result: Any) -> RailOutcome:
+    if isinstance(result, tuple):
+        result = result[0]
+    if not isinstance(result, RailOutcome):
+        raise TypeError(f"Output rail action must return RailOutcome, got {type(result).__name__}")
+    return result

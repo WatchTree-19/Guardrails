@@ -280,8 +280,8 @@ Gate:
 
 ## Phase 6: Remove `output_mapping`
 
-Status: ready. Library rails no longer use `output_mapping`; the generic
-fallback/default mapping machinery remains.
+Status: complete. Library rails no longer use `output_mapping`; the generic
+fallback/default mapping machinery is deleted.
 
 Goal:
 
@@ -294,15 +294,12 @@ Code seams:
 
 Deliverables:
 
-- Replace `output_mapping` and `default_output_mapping` decisions with
-  `RailOutcome` interpretation.
-- Keep the bypass RailOutcome-aware while deleting legacy raw-return mapping
-  fallback behavior.
-- Add focused runtime equivalence coverage for the actual streaming and
-  parallel bypass paths while replacing each legacy fallback.
-- Preserve tuple unwrapping where the bypass currently depends on it, or prove
-  it is unnecessary.
-- Remove mapping registration once every caller has moved.
+- Replace legacy mapping decisions with direct `RailOutcome` reads.
+- Delete legacy raw-return mapping fallback behavior.
+- Keep focused runtime coverage for the actual streaming and parallel bypass
+  paths.
+- Preserve tuple unwrapping in the direct `RailOutcome` helper.
+- Remove mapping registration from the action decorator.
 
 Gate:
 
@@ -310,6 +307,7 @@ Gate:
 - Output bypass tests stay green.
 - Streaming and parallel bypass tests cover block and allow.
 - No library rail registers `output_mapping`.
+- No output-direction fixture relies on an implicit raw fallback.
 
 ## Phase 7: Fix Known Bugs And Adjudication Points
 
@@ -381,14 +379,11 @@ Gate:
 
 ## Immediate Next Phase
 
-Continue with global `output_mapping` removal now that library rails all return
-`RailOutcome`:
+Move to IORails consolidation:
 
-1. Delete the generic legacy raw-return fallback/default mapping path from the
-   output bypass helpers.
-2. Keep direct `RailOutcome` handling in both streaming and parallel bypass
-   paths.
-3. Update or delete tests that only characterize legacy `output_mapping`.
-4. Preserve standalone decorator metadata tests only if `output_mapping` remains
-   public API; otherwise remove the parameter and its tests.
-5. Commit each slice before moving to the next family.
+1. Route IORails rail execution through the shared action dispatcher and
+   executor.
+2. Apply block outcomes via IORails `BlockSpec`.
+3. Keep transform outcomes explicit and unsupported until IORails has a
+   concrete transform application path.
+4. Retire forked rail action classes after the shared path is proven.

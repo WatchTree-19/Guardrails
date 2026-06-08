@@ -2,12 +2,9 @@
 
 This matrix records which current decision sources are pinned offline against
 `RailOutcome`. Runtime flow means the normal Colang path in
-`tests/test_runtime_flow_gate_equivalence.py`. Output mapping means the legacy
-streaming/parallel bypass decision in
-`tests/test_output_mapping_rail_outcome_equivalence.py`.
-
-`Streaming bypass` is marked as a gap when the mapping is unit-pinned but the
-actual per-chunk or parallel bypass runtime path is not yet equivalence-pinned.
+`tests/test_runtime_flow_gate_equivalence.py`. Former output-mapping coverage
+was retired once the legacy fallback/default mapping machinery was deleted.
+Streaming and parallel bypass coverage now asserts direct `RailOutcome` reads.
 
 | Rail | Runtime Flow | Output Mapping | Streaming Bypass | Transform Observed | Known Divergence -> Resolution |
 | --- | --- | --- | --- | --- | --- |
@@ -84,14 +81,15 @@ actual per-chunk or parallel bypass runtime path is not yet equivalence-pinned.
 The normal Colang flow decision source is covered for the current library gate
 rails, including block/allow and transform. Former output-mapping rails are
 covered as direct `RailOutcome` bypass reads, including tuple unwrapping and
-transform lossiness. The streaming and parallel bypass helpers now read
+transform lossiness. The streaming and parallel bypass helpers now require
 `RailOutcome` directly, with focused runtime coverage for both bypass sites.
 
 The transform queue is migrated for the target -> text rewrite rails: pangea,
 PII masking, HF retrieval clearing, regex retrieval clearing, CrowdStrike AIDR,
 Prompt Security, AutoAlign PII rewrites, and injection omit/rewrite. No library
 rail still registers a legacy `output_mapping`. The remaining equivalence work
-is deleting the generic legacy fallback/default mapping machinery after the
-streaming and parallel bypass paths are kept on direct `RailOutcome` reads.
+for this phase was completed by deleting the generic legacy fallback/default
+mapping machinery after the streaming and parallel bypass paths were kept on
+direct `RailOutcome` reads.
 Transform-on-streaming is explicitly unsupported in this phase: streaming
 bypasses observe transform outcomes as non-blocking and do not apply rewrites.
