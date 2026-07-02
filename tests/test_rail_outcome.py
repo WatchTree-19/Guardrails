@@ -18,7 +18,6 @@ import dataclasses
 import pytest
 
 from nemoguardrails.actions.rail_outcome import (
-    BlockSpec,
     RailDecision,
     RailOutcome,
     TransformSpec,
@@ -30,7 +29,6 @@ def test_allow_is_not_blocked():
     outcome = RailOutcome.allow()
     assert outcome.decision is RailDecision.ALLOW
     assert outcome.is_blocked is False
-    assert outcome.block_spec is None
     assert outcome.transform_spec is None
 
 
@@ -39,32 +37,13 @@ def test_allow_carries_metadata():
     assert outcome.metadata == {"policy_violations": [], "score": 0.1}
 
 
-def test_block_defaults_to_hard_abort():
-    outcome = RailOutcome.block(reason="unsafe")
+def test_block_is_blocked_with_reason_and_metadata():
+    outcome = RailOutcome.block(reason="unsafe", policy_violations=["S1: Violence"])
+    assert outcome.decision is RailDecision.BLOCK
     assert outcome.is_blocked is True
-    assert outcome.block_spec is not None
-    assert outcome.block_spec.abort is True
     assert outcome.reason == "unsafe"
-
-
-def test_soft_block_without_abort_is_preserved():
-    outcome = RailOutcome.block(abort=False, refusal_intent="inform answer unknown")
-    assert outcome.is_blocked is True
-    assert outcome.block_spec is not None
-    assert outcome.block_spec.abort is False
-    assert outcome.block_spec.refusal_intent == "inform answer unknown"
-
-
-def test_block_with_typed_exception_and_multilingual_refusal():
-    outcome = RailOutcome.block(
-        exception_type="ContentSafetyCheckInputException",
-        refusal_message="No puedo ayudar con eso.",
-        language="es",
-    )
-    assert outcome.block_spec is not None
-    assert outcome.block_spec.exception_type == "ContentSafetyCheckInputException"
-    assert outcome.block_spec.refusal_message == "No puedo ayudar con eso."
-    assert outcome.block_spec.language == "es"
+    assert outcome.metadata == {"policy_violations": ["S1: Violence"]}
+    assert outcome.transform_spec is None
 
 
 def test_transform_targets_a_variable():
@@ -74,19 +53,17 @@ def test_transform_targets_a_variable():
     assert outcome.transform_spec == TransformSpec(target=TransformTarget.USER_MESSAGE, text="masked text")
 
 
-def test_block_payload_required_for_block_decision():
-    with pytest.raises(ValueError, match="block_spec must be set if and only if decision is BLOCK"):
-        RailOutcome(decision=RailDecision.BLOCK)
-
-
-def test_block_payload_forbidden_for_allow_decision():
-    with pytest.raises(ValueError, match="block_spec must be set if and only if decision is BLOCK"):
-        RailOutcome(decision=RailDecision.ALLOW, block_spec=BlockSpec())
-
-
 def test_transform_payload_required_for_transform_decision():
     with pytest.raises(ValueError, match="transform_spec must be set if and only if decision is TRANSFORM"):
         RailOutcome(decision=RailDecision.TRANSFORM)
+
+
+def test_transform_payload_forbidden_for_block_decision():
+    with pytest.raises(ValueError, match="transform_spec must be set if and only if decision is TRANSFORM"):
+        RailOutcome(
+            decision=RailDecision.BLOCK,
+            transform_spec=TransformSpec(target=TransformTarget.USER_MESSAGE, text="x"),
+        )
 
 
 def test_outcome_is_immutable():

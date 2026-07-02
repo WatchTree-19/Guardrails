@@ -13,23 +13,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""The rich, structured outcome of a single rail check.
+"""The engine-neutral outcome of a single rail check.
 
-``RailOutcome`` is the canonical result a rail produces, superseding three
-narrower encodings that exist today:
+``RailOutcome`` is the canonical, backend-agnostic verdict a rail produces. It
+carries only the DECISION and neutral evidence, never how a consequence is
+rendered: which exception to raise, which bot intent or refusal message to
+emit, and how to localize it are presentation concerns that each engine (the
+Colang flow, IORails) decides for itself from this outcome plus its config.
 
-- ``RailResult(is_safe, reason)`` on the IORails path,
-- the lossy ``output_mapping`` boolean consulted on the streaming and
-  parallel bypass paths, and
-- the raw heterogeneous return values (bool, str, dict, vendor models) that
-  Colang flows interpret by hand.
+Fields:
+- ``decision``: ALLOW / BLOCK / TRANSFORM.
+- ``reason``: optional neutral, human-readable explanation.
+- ``metadata``: neutral evidence the decision is based on (policy violations,
+  categories, scores). Never load-bearing for the decision itself.
+- ``transform_spec``: for TRANSFORM, which conversation variable is rewritten
+  and to what.
 
-It carries the full outcome spectrum observed across the rail library so a
-single implementation per rail can drive both the Colang runtime and the
-IORails engine without either side losing information.
-
-This module is additive: nothing consumes ``RailOutcome`` yet. Adapters on
-each engine are introduced in later phases.
+Deliberately NOT here (they are rendering, not decision): exception type,
+refusal intent/message, language, and Colang event/context-update channels.
+A BLOCK always means "stop"; there is no soft-block flag.
 """
 
 from dataclasses import dataclass, field
@@ -54,28 +56,6 @@ class TransformTarget(Enum):
 
 
 @dataclass(frozen=True, slots=True)
-class BlockSpec:
-    """How a BLOCK decision is carried out.
-
-    ``abort`` records whether the flow stops the turn (hard block) or emits a
-    message and continues (soft block). It is recorded from the rail's actual
-    behavior, never inferred: the ``patronus api check output`` flow blocks
-    without aborting, and that distinction must survive.
-
-    A block may name a typed ``exception_type`` (used when
-    ``enable_rails_exceptions`` is set), a dialog ``refusal_intent`` resolved
-    by the NLU layer (e.g. ``refuse to respond``), or an already-resolved
-    literal ``refusal_message`` with its ``language`` (multilingual refusal).
-    """
-
-    abort: bool = True
-    exception_type: str | None = None
-    refusal_intent: str | None = None
-    refusal_message: str | None = None
-    language: str | None = None
-
-
-@dataclass(frozen=True, slots=True)
 class TransformSpec:
     """A rewrite of a single conversation variable."""
 
@@ -85,33 +65,25 @@ class TransformSpec:
 
 @dataclass(frozen=True, slots=True)
 class RailOutcome:
-    """The structured verdict of one rail check.
+    """The engine-neutral verdict of one rail check.
 
-    ``block`` is set if and only if ``decision`` is BLOCK; ``transform`` is set
-    if and only if ``decision`` is TRANSFORM. ``metadata`` holds side data that
-    flows expose as globals (policy violations, scores, categories, reasoning
-    traces) and is never load-bearing for the decision itself. ``events`` and
-    ``context_updates`` preserve the Colang ``ActionResult`` channels so the
-    Colang adapter loses nothing.
+    ``transform_spec`` is set if and only if ``decision`` is TRANSFORM. Each
+    engine renders the consequence of a BLOCK its own way; this object does not
+    encode it.
     """
 
     decision: RailDecision
     reason: str | None = None
-    block_spec: BlockSpec | None = None
-    transform_spec: TransformSpec | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
-    events: tuple[dict[str, Any], ...] = ()
-    context_updates: dict[str, Any] = field(default_factory=dict)
+    transform_spec: TransformSpec | None = None
 
     def __post_init__(self) -> None:
-        if (self.block_spec is not None) != (self.decision is RailDecision.BLOCK):
-            raise ValueError("block_spec must be set if and only if decision is BLOCK")
         if (self.transform_spec is not None) != (self.decision is RailDecision.TRANSFORM):
             raise ValueError("transform_spec must be set if and only if decision is TRANSFORM")
 
     @property
     def is_blocked(self) -> bool:
-        """Single source the streaming and parallel bypass paths read."""
+        """The single field both engines read to gate; rendering is theirs."""
         return self.decision is RailDecision.BLOCK
 
     @classmethod
@@ -119,29 +91,8 @@ class RailOutcome:
         return cls(decision=RailDecision.ALLOW, reason=reason, metadata=dict(metadata))
 
     @classmethod
-    def block(
-        cls,
-        *,
-        abort: bool = True,
-        exception_type: str | None = None,
-        refusal_intent: str | None = None,
-        refusal_message: str | None = None,
-        language: str | None = None,
-        reason: str | None = None,
-        **metadata: Any,
-    ) -> "RailOutcome":
-        return cls(
-            decision=RailDecision.BLOCK,
-            reason=reason,
-            block_spec=BlockSpec(
-                abort=abort,
-                exception_type=exception_type,
-                refusal_intent=refusal_intent,
-                refusal_message=refusal_message,
-                language=language,
-            ),
-            metadata=dict(metadata),
-        )
+    def block(cls, *, reason: str | None = None, **metadata: Any) -> "RailOutcome":
+        return cls(decision=RailDecision.BLOCK, reason=reason, metadata=dict(metadata))
 
     @classmethod
     def transform(
